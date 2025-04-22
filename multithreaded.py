@@ -27,13 +27,18 @@ def run_serial(queue):
         data = arduino.readline().decode()
         if(data != ''):
             print(data) # printing the value
-        command_tuple = queue.get()
-        if(command_tuple[0]) == 'q':
-            break
-        else:
-            command = command_tuple[1]
-            if command is not None:
-                arduino.write(bytes(command, 'utf-8'))
+        if not queue.empty():
+            command_tuple = (None,None)
+            try:
+                command_tuple = queue.get(block=False)
+            except queue.Empty:
+                pass
+            if(command_tuple[0]) == 'q':
+                break
+            else:
+                command = command_tuple[1]
+                if command is not None:
+                    arduino.write(bytes(command, 'utf-8'))
 
 def run_user_input(serial_queue, camera_queue):
     print("starting user input thread")
@@ -89,20 +94,25 @@ def run_camera(queue):
         if result:
             cv2.imshow("webcam", image)
 
-        command_tuple = queue.get()
-        if(command_tuple[0]) == 'q':
-            break
-        elif(command_tuple[0] == 'e'):
-            exposure = command_tuple[1]
-            cam.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
-            cam.set(cv2.CAP_PROP_EXPOSURE, exposure)
-        elif(command_tuple[0] == 's'):
-            baseName = command_tuple[1]
-            fileName = baseName + str(capture_count) + ".png"
-            cv2.imwrite(fileName, image)
-            capture_count += 1
-        elif(command_tuple[0] == 'ae'):
-            cam.set(cv2.CAP_PROP_AUTO_EXPOSURE, 3)
+        command_tuple = (None,None)
+        if not queue.empty():
+            try:
+                command_tuple = queue.get(block=False)
+            except queue.Empty:
+                pass
+            if(command_tuple[0]) == 'q':
+                break
+            elif(command_tuple[0] == 'e'):
+                exposure = command_tuple[1]
+                cam.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
+                cam.set(cv2.CAP_PROP_EXPOSURE, exposure)
+            elif(command_tuple[0] == 's'):
+                baseName = command_tuple[1]
+                fileName = baseName + str(capture_count) + ".png"
+                cv2.imwrite(fileName, image)
+                capture_count += 1
+            elif(command_tuple[0] == 'ae'):
+                cam.set(cv2.CAP_PROP_AUTO_EXPOSURE, 3)
 
         cv2.waitKey(1)
 
