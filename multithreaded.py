@@ -22,7 +22,8 @@ def is_convertible_to_float(input):
 
 def run_serial(queue):
     print("starting serial thread")
-    arduino = serial.Serial(port='COM3', baudrate=9600, timeout=.1) 
+    timeout_setting = 0.01
+    arduino = serial.Serial(port='COM3', baudrate=9600, timeout=timeout_setting)
     while True:
         data = arduino.readline().decode()
         if(data != ''):
