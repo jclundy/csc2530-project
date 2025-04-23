@@ -22,6 +22,11 @@ def is_convertible_to_float(input):
     except ValueError:
         return False
 
+def log_pose(file, step, laser, pan, tilt):
+    line = str(step) + ", " + str(laser) + ", " + str(pan) + ", " + str(tilt)
+    file.write(line)
+    file.write("\n")
+
 def run_serial(queue):
     print("starting serial thread")
     timeout_setting = 0.01

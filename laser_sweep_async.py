@@ -5,10 +5,6 @@ import time
 import os
 import numpy as np
 
-def log_pose(file, step, laser, pan, tilt):
-    line = str(step) + ", " + str(laser) + ", " + str(pan) + ", " + str(tilt)
-    file.write(line)
-    file.write("\n")
 
 def run_command_sequence(queue, params, serial_queue, camera_queue):
     laserStartAngle = params["startAngle"]
