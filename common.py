@@ -87,6 +87,7 @@ def run_camera(queue):
     cam_port = 1
     cam = cv2.VideoCapture(cam_port)
     cam.set(cv2.CAP_PROP_AUTO_EXPOSURE, 3)
+    cam.set(cv2.CAP_PROP_AUTOFOCUS, 1)
     # cam.set(cv2.CAP_PROP_EXPOSURE, -6)  # Set exposure time to -6 (in log base 2)
     cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)  # Set the resolution to 1280x720
     cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
@@ -114,6 +115,9 @@ def run_camera(queue):
                 fileName = baseName + str(capture_count) + ".png"
                 cv2.imwrite(fileName, image)
                 capture_count += 1
+            elif(command_tuple[0] == 'sn'):
+                fileName = command_tuple[1]
+                cv2.imwrite(fileName, image)
             elif(command_tuple[0] == 'ae'):
                 cam.set(cv2.CAP_PROP_AUTO_EXPOSURE, 3)
 
