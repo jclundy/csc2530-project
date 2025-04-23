@@ -68,7 +68,7 @@ def run_command_sequence(queue, params, serial_queue, camera_queue, serialEvent,
     if not os.path.exists(regularImgPath):
         os.makedirs(regularImgPath)
 
-    for i in range(0,numSteps):
+    for i in range(0,numSteps+1):
         command_tuple = (None,None)
         if not queue.empty():
             try:
@@ -78,6 +78,16 @@ def run_command_sequence(queue, params, serial_queue, camera_queue, serialEvent,
             if(command_tuple[0]) == 'q':
                 return
         else:
+            # 0 move pan servo to next position
+            currentPanAngle = np.round(panStartAngle + i * panIncrement)
+            print("setting pan angle to " + str(currentPanAngle))
+            panAngleCommand = "c:" + str(currentPanAngle)  + "\n"
+            serial_queue.put(('s', panAngleCommand))
+            serialEvent.wait()
+            # wait 5 seconds
+            event.wait(5)
+            
+            print("logging current position")
             log_pose(logFile, i, currentLaserAngle, currentPanAngle, currentTiltAngle)
 
             # 1 Save regular image - laser off
@@ -89,7 +99,8 @@ def run_command_sequence(queue, params, serial_queue, camera_queue, serialEvent,
 
             # wait 1 second
             event.wait(1)
-            # 2 Turn laser on 
+            # 2 Turn laser on
+            print("turning laser on") 
             serial_queue.put(('s', laserOnCommand))
             serialEvent.wait()
             # wait 1 second
@@ -103,17 +114,10 @@ def run_command_sequence(queue, params, serial_queue, camera_queue, serialEvent,
             # wait 1 seconds
             event.wait(1)
             # 4 turn laser off
+            print("turning laser off")
             serial_queue.put(('s', laserOffCommand))
             serialEvent.wait()
             event.wait(1)
-            # 5 move pan servo to next position
-            currentPanAngle = np.round(panStartAngle + (i+1) * panIncrement)
-            print("setting pan angle to " + str(currentPanAngle))
-            panAngleCommand = "c:" + str(currentPanAngle)  + "\n"
-            serial_queue.put(('s', panAngleCommand))
-            serialEvent.wait()
-            # wait 5 seconds
-            event.wait(5)
 
 def run_user_input(serial_queue, camera_queue, command_queue):
     print("starting user input thread")
