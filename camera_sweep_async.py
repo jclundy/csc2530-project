@@ -124,6 +124,7 @@ def run_command_sequence(queue, params, serial_queue, camera_queue, serialEvent,
             # 3b set low exposure
             camera_queue.put(('e', laserExposureSetting))
             cameraEvent.wait()
+            event.wait(1)
             # save image
             laserImageFileName = os.path.join(laserLowExposurePath, "laser_low_exp_") + str(i) + ".png"
             print("saving image file at " + laserImageFileName)
