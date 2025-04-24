@@ -13,9 +13,15 @@ if __name__ == '__main__':
     camera_queue = Queue()
     serial_queue = Queue()
 
+    userInput = input("Enter camera port: ")
+    while (is_convertible_to_int(userInput) == False):
+        print("Invalid numeric input")
+        userInput = input("Enter camera port: ")
+    camPort = int(userInput)
+
     user_input_thread = Thread(target=run_user_input, args=(serial_queue, camera_queue,))
     serial_thread = Thread(target=run_serial, args=(serial_queue, serial_event, ))
-    camera_thread = Thread(target=run_camera, args=(camera_queue, camera_event, ))
+    camera_thread = Thread(target=run_camera, args=(camera_queue, camera_event, camPort))
 
     user_input_thread.start()
     serial_thread.start()

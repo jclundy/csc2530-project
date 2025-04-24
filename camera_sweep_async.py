@@ -169,7 +169,7 @@ if __name__ == '__main__':
     serial_event = Event()
 
     serial_thread = Thread(target=run_serial, args=(serial_queue,serial_event, ))
-    camera_thread = Thread(target=run_camera, args=(camera_queue,camera_event, ))
+    camera_thread = Thread(target=run_camera, args=(camera_queue,camera_event, 2))
 
     serial_thread.start()
     camera_thread.start()

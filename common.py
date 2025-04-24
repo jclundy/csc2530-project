@@ -87,10 +87,9 @@ def run_user_input(serial_queue, camera_queue):
             serial_queue.put(serial_command)
         event.wait(0.1)
 
-def run_camera(queue, cameraEvent):
+def run_camera(queue, cameraEvent, cam_port=1):
     print("starting camera thread")
 
-    cam_port = 1
     cam = cv2.VideoCapture(cam_port)
     cam.set(cv2.CAP_PROP_AUTO_EXPOSURE, 3)
     cam.set(cv2.CAP_PROP_AUTOFOCUS, 1)
