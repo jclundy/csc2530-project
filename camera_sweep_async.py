@@ -45,6 +45,11 @@ def run_command_sequence(queue, params, serial_queue, camera_queue, serialEvent,
     serial_queue.put(('s', laserAngleCommand))
     serialEvent.wait()
 
+    exposureSetting = params["exposureSetting"]
+    print("setting exposure to: " + str(exposureSetting))
+    camera_queue.put(('e', exposureSetting))
+    cameraEvent.wait()
+
     laserOnCommand = "a:1\n"
     laserOffCommand = "a:0\n"
 
@@ -185,6 +190,12 @@ if __name__ == '__main__':
         userInput = input("Enter laser incremental angle: ")
     panIncrement = np.abs(int(userInput))
 
+    userInput = input("Enter default exposure setting: ")
+    while (is_convertible_to_int(userInput) == False):
+        print("Invalid numeric input")
+        userInput = input("Enter default exposure setting: ")
+    exposureSetting = int(userInput)
+
     if(panEndAngle < panStartAngle):
         panIncrement *= -1 
  
@@ -202,6 +213,7 @@ if __name__ == '__main__':
     params["baseDir"] =  baseDir
     params["laserAngle"] =  laserAngle
     params["tiltAngle"] =  tiltAngle
+    params["exposureSetting"] = exposureSetting
 
     # Start threads
     print("running camera sweep routine")
