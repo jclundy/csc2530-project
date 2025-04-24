@@ -65,6 +65,7 @@ def run_command_sequence(queue, params, serial_queue, camera_queue, serialEvent,
     imagesPath = os.path.join(baseDir, "images")
     laserImgPath = os.path.join(imagesPath, "laserOn")
     regularImgPath = os.path.join(imagesPath, "laserOff")
+    laserLowExposurePath = os.path.join(imagesPath, "laserLowExp")
 
     if not os.path.exists(imagesPath):
         os.makedirs(imagesPath)
@@ -72,6 +73,8 @@ def run_command_sequence(queue, params, serial_queue, camera_queue, serialEvent,
         os.makedirs(laserImgPath)
     if not os.path.exists(regularImgPath):
         os.makedirs(regularImgPath)
+    if not os.path.exists(laserLowExposurePath):
+        os.makedirs(laserLowExposurePath)
 
     for i in range(0,numSteps+1):
         command_tuple = (None,None)
@@ -118,11 +121,28 @@ def run_command_sequence(queue, params, serial_queue, camera_queue, serialEvent,
             cameraEvent.wait()
             # wait 1 seconds
             event.wait(1)
+            # 3b set low exposure
+            camera_queue.put(('e', laserExposureSetting))
+            cameraEvent.wait()
+            # save image
+            laserImageFileName = os.path.join(laserLowExposurePath, "laser_low_exp_") + str(i) + ".png"
+            print("saving image file at " + laserImageFileName)
+            save_command = ('sn', laserImageFileName)
+            camera_queue.put(save_command)
+            cameraEvent.wait()
+            # wait 1 seconds
+            event.wait(1)
+
+            # return to regular exposure
+            camera_queue.put(('e', exposureSetting))
+            cameraEvent.wait()
+
             # 4 turn laser off
             print("turning laser off")
             serial_queue.put(('s', laserOffCommand))
             serialEvent.wait()
             event.wait(1)
+    print("Done !")
 
 def run_user_input(serial_queue, camera_queue, command_queue):
     print("starting user input thread")
@@ -196,6 +216,12 @@ if __name__ == '__main__':
         userInput = input("Enter default exposure setting: ")
     exposureSetting = int(userInput)
 
+    userInput = input("Enter laser exposure setting: ")
+    while (is_convertible_to_int(userInput) == False):
+        print("Invalid numeric input")
+        userInput = input("Enter laser exposure setting: ")
+    laserExposureSetting = int(userInput)
+
     if(panEndAngle < panStartAngle):
         panIncrement *= -1 
  
@@ -214,6 +240,7 @@ if __name__ == '__main__':
     params["laserAngle"] =  laserAngle
     params["tiltAngle"] =  tiltAngle
     params["exposureSetting"] = exposureSetting
+    params["laserExposureSetting"] = laserExposureSetting
 
     # Start threads
     print("running camera sweep routine")
