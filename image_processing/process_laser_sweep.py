@@ -18,7 +18,40 @@ dist = calibrationParams['dist']
 w = image_size[0]
 h = image_size[1]
 
-testNumber = input("input test folder number:　")
+testNumber = input("input test folder number: ")
+
+# searchBoxMinX = input("input searchBoxMinX: ")
+# searchBoxMaxX = input("input searchBoxMaxX: ")
+# searchBoxMinY = input("input searchBoxMinY: ")
+# searchBoxMaxY = input("input searchBoxMaxY: ")
+
+# if(searchBoxMinX == ""):
+#     searchBoxMinX = 0
+# if(searchBoxMaxX == ""):
+#     searchBoxMaxX = 0
+# if(searchBoxMinY == ""):
+#     searchBoxMinY = 0
+# if(searchBoxMaxY == ""):
+#     searchBoxMaxY = 0            
+
+ap = argparse.ArgumentParser()
+ap.add_argument("-x0", "--minX", type=int, default=0)
+ap.add_argument("-x1", "--maxX",  type=int, default=w)
+ap.add_argument("-y0", "--minY",  type=int, default=0)
+ap.add_argument("-y1", "--maxY",  type=int, default=h)
+args = vars(ap.parse_args())
+
+searchBoxMinX = args["minX"]
+searchBoxMaxX = args["maxX"]
+searchBoxMinY = args["minY"]
+searchBoxMaxY = args["maxY"]
+
+searchBoxMinX = int(searchBoxMinX)
+searchBoxMinY = int(searchBoxMinY)
+searchBoxMaxX = int(searchBoxMaxX)
+searchBoxMaxY = int(searchBoxMaxY)
+
+print("search box = ", (searchBoxMinX, searchBoxMinY), (searchBoxMaxX, searchBoxMaxY))
 
 base_folder = "C:/Users/littl/OneDrive - University of Toronto/Winter 2025/CSC2530/Project/datasets/scans/laser sweep/laserSweepDistanceTests/laserSweep"
 base_folder = base_folder + str(testNumber)
@@ -44,17 +77,6 @@ laserDots = []
 
 blur_radius = 5
 annotation_radius = 10
-
-
-searchBoxMinX = 0
-searchBoxMinY = 0
-searchBoxMaxX = w
-searchBoxMaxY = h
-
-searchBoxMinX = int(searchBoxMinX)
-searchBoxMinY = int(searchBoxMinY)
-searchBoxMaxX = int(searchBoxMaxX)
-searchBoxMaxY = int(searchBoxMaxY)
 
 for i in range(0,numCaptures, skipStep):
     print("Capture: ", str(i))
